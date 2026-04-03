@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finanzas Familia RR</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'IBM Plex Sans',sans-serif; background:#f5f5f4; color:#1a1a1a; padding:24px; font-size:14px; }
+.header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+.header h1 { font-size:18px; font-weight:600; }
+.header-meta { font-family:'IBM Plex Mono',monospace; font-size:11px; color:#999; margin-top:2px; }
+.dot { width:7px; height:7px; border-radius:50%; background:#22c55e; display:inline-block; margin-right:5px; animation:blink 2s infinite; }
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.refresh-btn { padding:7px 14px; background:#fff; border:1px solid #e0e0e0; border-radius:6px; font-family:'IBM Plex Sans',sans-serif; font-size:13px; cursor:pointer; color:#555; transition:all .15s; }
+.refresh-btn:hover { border-color:#999; color:#1a1a1a; }
+.controls { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; align-items:center; }
+.btn-group { display:flex; background:#fff; border:1px solid #e0e0e0; border-radius:6px; overflow:hidden; }
+.btn-p { padding:7px 12px; background:transparent; border:none; border-right:1px solid #e0e0e0; font-family:'IBM Plex Sans',sans-serif; font-size:13px; color:#777; cursor:pointer; transition:all .15s; }
+.btn-p:last-child { border-right:none; }
+.btn-p.active { background:#1a1a1a; color:#fff; }
+.btn-p:hover:not(.active) { background:#f0f0f0; }
+select, input[type=text] { padding:7px 12px; background:#fff; border:1px solid #e0e0e0; border-radius:6px; font-family:'IBM Plex Sans',sans-serif; font-size:13px; color:#1a1a1a; outline:none; transition:border-color .15s; }
+select:focus, input:focus { border-color:#888; }
+input::placeholder { color:#bbb; }
+input[type=text] { min-width:200px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:20px; }
+.kpi { background:#fff; border:1px solid #e8e8e8; border-radius:8px; padding:16px 18px; }
+.kpi-label { font-size:11px; color:#999; text-transform:uppercase; letter-spacing:.4px; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
+.kpi-value { font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:500; line-height:1; }
+.kpi-sub { font-size:11px; color:#bbb; margin-top:5px; font-family:'IBM Plex Mono',monospace; }
+.red { color:#e53e3e; } .green { color:#16a34a; } .neutral { color:#1a1a1a; } .blue { color:#3b82f6; }
+.grid { display:grid; grid-template-columns:1fr 300px; gap:16px; margin-bottom:16px; }
+@media(max-width:800px){.grid{grid-template-columns:1fr;}}
+.card { background:#fff; border:1px solid #e8e8e8; border-radius:8px; padding:18px; }
+.card-title { font-size:11px; font-family:'IBM Plex Mono',monospace; color:#999; text-transform:uppercase; letter-spacing:.4px; margin-bottom:14px; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+th { font-family:'IBM Plex Mono',monospace; font-size:10px; color:#bbb; text-transform:uppercase; letter-spacing:.4px; padding:0 10px 8px; text-align:left; border-bottom:1px solid #f0f0f0; }
+td { padding:9px 10px; border-bottom:1px solid #f7f7f7; font-size:13px; vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:#fafafa; }
+.badge { display:inline-block; padding:2px 7px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:500; }
+.badge-g { background:#fef2f2; color:#e53e3e; }
+.badge-i { background:#f0fdf4; color:#16a34a; }
+.amt-g { color:#e53e3e; font-family:'IBM Plex Mono',monospace; font-size:13px; }
+.amt-i { color:#16a34a; font-family:'IBM Plex Mono',monospace; font-size:13px; }
+.dt { color:#bbb; font-family:'IBM Plex Mono',monospace; font-size:11px; }
+.motivo-cell { max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.top-list { display:flex; flex-direction:column; gap:12px; }
+.top-row { display:flex; flex-direction:column; gap:4px; }
+.top-header { display:flex; justify-content:space-between; }
+.top-name { font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
+.top-amt { font-family:'IBM Plex Mono',monospace; font-size:12px; color:#e53e3e; }
+.bar-bg { height:3px; background:#f0f0f0; border-radius:2px; overflow:hidden; }
+.bar-fill { height:100%; background:#1a1a1a; border-radius:2px; transition:width .6s; }
+.top-pct { font-size:10px; color:#bbb; font-family:'IBM Plex Mono',monospace; }
+.bullet-list { display:flex; flex-direction:column; gap:8px; }
+.bullet { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:6px; background:#fafafa; border:1px solid #f0f0f0; font-size:13px; line-height:1.5; color:#444; }
+.bullet.warn { border-left:2px solid #e53e3e; background:#fff8f8; }
+.bullet.ok   { border-left:2px solid #22c55e; background:#f8fff9; }
+.bullet.inf  { border-left:2px solid #3b82f6; background:#f8faff; }
+.bi { font-size:13px; flex-shrink:0; margin-top:1px; color:#999; }
+.pagination { display:flex; gap:6px; margin-top:14px; justify-content:flex-end; flex-wrap:wrap; }
+.pg { padding:5px 10px; background:#fff; border:1px solid #e0e0e0; border-radius:5px; font-family:'IBM Plex Mono',monospace; font-size:11px; cursor:pointer; color:#777; transition:all .12s; }
+.pg:hover:not(:disabled) { border-color:#888; color:#1a1a1a; }
+.pg.active { background:#1a1a1a; color:#fff; border-color:#1a1a1a; }
+.pg:disabled { opacity:.3; cursor:not-allowed; }
+.loader { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:48px 0; gap:12px; }
+.loader-bar { width:120px; height:2px; background:#f0f0f0; border-radius:1px; overflow:hidden; }
+.loader-fill { height:100%; background:#1a1a1a; animation:ld 1.2s ease-in-out infinite; }
+@keyframes ld{0%{width:0%;margin-left:0}50%{width:50%;margin-left:25%}100%{width:0%;margin-left:100%}}
+.loader-txt { font-family:'IBM Plex Mono',monospace; font-size:11px; color:#bbb; }
+.error-box { padding:16px; background:#fff8f8; border:1px solid #fecaca; border-radius:6px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:#e53e3e; line-height:1.7; }
+.empty { color:#bbb; font-family:'IBM Plex Mono',monospace; font-size:12px; padding:24px 0; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Finanzas Familia RR</h1>
+    <div class="header-meta"><span class="dot"></span><span id="status">Cargando...</span></div>
+  </div>
+  <button class="refresh-btn" onclick="loadData()">↻ Actualizar</button>
+</div>
+
+<div class="controls">
+  <div class="btn-group">
+    <button class="btn-p" onclick="setPeriod('today',this)">Hoy</button>
+    <button class="btn-p active" onclick="setPeriod('week',this)">7 días</button>
+    <button class="btn-p" onclick="setPeriod('month',this)">Este mes</button>
+    <button class="btn-p" onclick="setPeriod('last_month',this)">Mes ant.</button>
+    <button class="btn-p" onclick="setPeriod('all',this)">Todo</button>
+  </div>
+  <select id="type-filter" onchange="applyFilters()">
+    <option value="">Gastos e ingresos</option>
+    <option value="Gasto">Solo gastos</option>
+    <option value="Ingreso">Solo ingresos</option>
+  </select>
+  <input type="text" id="search" placeholder="Buscar motivo..." oninput="applyFilters()">
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="kpi-label">Total gastos</div><div class="kpi-value red" id="k-gastos">—</div><div class="kpi-sub" id="k-gastos-n">—</div></div>
+  <div class="kpi"><div class="kpi-label">Total ingresos</div><div class="kpi-value green" id="k-ingresos">—</div><div class="kpi-sub" id="k-ingresos-n">—</div></div>
+  <div class="kpi"><div class="kpi-label">Balance</div><div class="kpi-value neutral" id="k-balance">—</div><div class="kpi-sub">período seleccionado</div></div>
+  <div class="kpi"><div class="kpi-label">Mayor gasto</div><div class="kpi-value blue" id="k-top">—</div><div class="kpi-sub" id="k-top-name">—</div></div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-title">Movimientos</div>
+    <div id="table-area"><div class="loader"><div class="loader-bar"><div class="loader-fill"></div></div><div class="loader-txt">Conectando con Google Sheets...</div></div></div>
+    <div class="pagination" id="pag"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Top gastos</div>
+    <div id="top-area"><div class="loader"><div class="loader-bar"><div class="loader-fill"></div></div><div class="loader-txt">Calculando...</div></div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Análisis</div>
+  <div id="bullets-area"><div class="loader"><div class="loader-bar"><div class="loader-fill"></div></div><div class="loader-txt">Analizando...</div></div></div>
+</div>
+
+<script>
+const SHEET_ID = '1SK7vkmXjY1UtTlYBeVjVvzoDvdYfugAuYll6x7idjCw';
+const API_KEY  = 'AIzaSyCSFp95q8pCnTPQ0be7upCG0dieW8yBgcI';
+
+let allData=[], filtered=[], period='week', page=1;
+const PER_PAGE=20;
+
+function parseMonto(v) {
+  if (!v && v!==0) return 0;
+  let s = String(v).replace(/\s/g,'').replace('$','');
+  const hasComma = s.includes(',');
+  const hasDot   = s.includes('.');
+  if (hasComma && hasDot) {
+    s = s.replace(/\./g,'').replace(',','.');
+  } else if (hasComma && !hasDot) {
+    const parts = s.split(',');
+    if (parts[1] && parts[1].length <= 2) {
+      s = s.replace(',','.');
+    } else {
+      s = s.replace(/,/g,'');
+    }
+  }
+  return parseFloat(s) || 0;
+}
+
+function fmt(n) {
+  return '$' + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function parseDate(v) {
+  if (!v) return null;
+  const s = String(v).trim();
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return new Date(+m[3], +m[2]-1, +m[1]);
+  return new Date(s);
+}
+
+function fmtDate(v) {
+  const d = parseDate(v);
+  if (!d||isNaN(d)) return v;
+  return d.toLocaleDateString('es',{day:'2-digit',month:'short',year:'2-digit'});
+}
+
+function periodRange(p) {
+  const now=new Date(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  switch(p) {
+    case 'today':      return [today, new Date(today.getTime()+86400000)];
+    case 'week':       return [new Date(today.getTime()-7*86400000), new Date(today.getTime()+86400000)];
+    case 'month':      return [new Date(now.getFullYear(),now.getMonth(),1), new Date(today.getTime()+86400000)];
+    case 'last_month': return [new Date(now.getFullYear(),now.getMonth()-1,1), new Date(now.getFullYear(),now.getMonth(),1)];
+    default:           return [new Date('2000-01-01'), new Date('2099-01-01')];
+  }
+}
+
+function setPeriod(p,btn) {
+  period=p;
+  document.querySelectorAll('.btn-p').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters() {
+  const [from,to]=periodRange(period);
+  const type=document.getElementById('type-filter').value;
+  const q=document.getElementById('search').value.toLowerCase();
+  filtered=allData.filter(r=>{
+    const d=parseDate(r[3]);
+    if(!d||isNaN(d)||d<from||d>=to) return false;
+    if(type&&r[0]!==type) return false;
+    if(q&&!String(r[1]).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  page=1; render();
+}
+
+function render() { renderKPIs(); renderTable(); renderTop(); renderBullets(); }
+
+function renderKPIs() {
+  const gastos=filtered.filter(r=>r[0]==='Gasto');
+  const ingresos=filtered.filter(r=>r[0]==='Ingreso');
+  const totalG=gastos.reduce((s,r)=>s+parseMonto(r[2]),0);
+  const totalI=ingresos.reduce((s,r)=>s+parseMonto(r[2]),0);
+  const bal=totalI-totalG;
+  document.getElementById('k-gastos').textContent=fmt(totalG);
+  document.getElementById('k-gastos-n').textContent=gastos.length+' movimientos';
+  document.getElementById('k-ingresos').textContent=fmt(totalI);
+  document.getElementById('k-ingresos-n').textContent=ingresos.length+' movimientos';
+  const bEl=document.getElementById('k-balance');
+  bEl.textContent=(bal>=0?'+':'-')+fmt(bal);
+  bEl.className='kpi-value '+(bal>=0?'green':'red');
+  if(gastos.length){
+    const top=gastos.reduce((a,b)=>parseMonto(a[2])>parseMonto(b[2])?a:b);
+    document.getElementById('k-top').textContent=fmt(parseMonto(top[2]));
+    document.getElementById('k-top-name').textContent=top[1];
+  }
+}
+
+function renderTable() {
+  const area=document.getElementById('table-area');
+  if(!filtered.length){area.innerHTML='<p class="empty">Sin movimientos en este período.</p>';document.getElementById('pag').innerHTML='';return;}
+  const sorted=[...filtered].sort((a,b)=>{const da=parseDate(a[3]),db=parseDate(b[3]);return (db||0)-(da||0);});
+  const start=(page-1)*PER_PAGE;
+  const slice=sorted.slice(start,start+PER_PAGE);
+  let h='<div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Motivo</th><th>Monto</th><th>Fecha</th></tr></thead><tbody>';
+  slice.forEach(r=>{
+    const g=r[0]==='Gasto';
+    h+=`<tr><td><span class="badge ${g?'badge-g':'badge-i'}">${r[0]}</span></td><td class="motivo-cell" title="${r[1]||''}">${r[1]||'—'}</td><td class="${g?'amt-g':'amt-i'}">${g?'-':'+'}${fmt(parseMonto(r[2]))}</td><td class="dt">${fmtDate(r[3])}</td></tr>`;
+  });
+  h+='</tbody></table></div>';
+  area.innerHTML=h;
+  const totalPgs=Math.ceil(sorted.length/PER_PAGE);
+  let pg='';
+  if(totalPgs>1){
+    pg+=`<button class="pg" onclick="goPage(${page-1})" ${page===1?'disabled':''}>←</button>`;
+    for(let i=1;i<=totalPgs;i++) pg+=`<button class="pg ${i===page?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    pg+=`<button class="pg" onclick="goPage(${page+1})" ${page===totalPgs?'disabled':''}>→</button>`;
+  }
+  document.getElementById('pag').innerHTML=pg;
+}
+
+function goPage(p){page=p;renderTable();}
+
+function renderTop() {
+  const area=document.getElementById('top-area');
+  const gastos=filtered.filter(r=>r[0]==='Gasto');
+  if(!gastos.length){area.innerHTML='<p class="empty">Sin gastos.</p>';return;}
+  // Agrupar por motivo
+  const map={};
+  gastos.forEach(r=>{
+    const key=String(r[1]||'Sin motivo').trim();
+    map[key]=(map[key]||0)+parseMonto(r[2]);
+  });
+  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const total=gastos.reduce((s,r)=>s+parseMonto(r[2]),0);
+  let h='<div class="top-list">';
+  sorted.forEach(([name,amt])=>{
+    const pct=total>0?Math.round(amt/total*100):0;
+    h+=`<div class="top-row"><div class="top-header"><span class="top-name" title="${name}">${name}</span><span class="top-amt">${fmt(amt)}</span></div><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><div class="top-pct">${pct}% del total</div></div>`;
+  });
+  h+='</div>';
+  area.innerHTML=h;
+}
+
+function renderBullets() {
+  const area=document.getElementById('bullets-area');
+  if(!filtered.length){area.innerHTML='<p class="empty">Sin datos.</p>';return;}
+  const gastos=filtered.filter(r=>r[0]==='Gasto');
+  const ingresos=filtered.filter(r=>r[0]==='Ingreso');
+  const totalG=gastos.reduce((s,r)=>s+parseMonto(r[2]),0);
+  const totalI=ingresos.reduce((s,r)=>s+parseMonto(r[2]),0);
+  const bal=totalI-totalG;
+  const items=[];
+  if(bal>=0) items.push({cl:'ok',icon:'↑',txt:`Balance positivo de ${fmt(bal)}. Ingresaste más de lo que gastaste en este período.`});
+  else       items.push({cl:'warn',icon:'↓',txt:`Balance negativo de ${fmt(Math.abs(bal))}. Gastaste ${fmt(Math.abs(bal))} más de lo que ingresaste.`});
+  if(gastos.length){
+    const top=gastos.reduce((a,b)=>parseMonto(a[2])>parseMonto(b[2])?a:b);
+    items.push({cl:'inf',icon:'→',txt:`Mayor gasto individual: ${top[1]} — ${fmt(parseMonto(top[2]))}.`});
+  }
+  if(gastos.length&&period!=='all'){
+    const [from,to]=periodRange(period);
+    const dias=Math.max(1,Math.round((to-from)/86400000));
+    items.push({cl:'',icon:'≈',txt:`Gasto promedio diario: ${fmt(totalG/dias)} (${dias} días).`});
+  }
+  if(gastos.length){
+    const freq={};
+    gastos.forEach(r=>{freq[r[1]]=(freq[r[1]]||0)+1;});
+    const [topM,topN]=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];
+    if(topN>1) items.push({cl:'inf',icon:'↻',txt:`"${topM}" es el gasto más frecuente: ${topN} veces.`});
+  }
+  let h='<div class="bullet-list">';
+  items.forEach(b=>{h+=`<div class="bullet ${b.cl}"><span class="bi">${b.icon}</span><span>${b.txt}</span></div>`;});
+  h+='</div>';
+  area.innerHTML=h;
+}
+
+async function loadData() {
+  document.getElementById('status').textContent='Actualizando...';
+  // Columnas: A=Tipo, B=Motivo, C=Monto, D=Fecha
+  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:D?key=${API_KEY}`;
+  try {
+    const res=await fetch(url);
+    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Error de API');}
+    const data=await res.json();
+    allData=(data.values||[]).slice(1).filter(r=>r&&r[0]);
+    const t=new Date();
+    document.getElementById('status').textContent=`${allData.length} movimientos · ${t.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})}`;
+    applyFilters();
+  } catch(e) {
+    document.getElementById('status').textContent='Error al cargar';
+    const err=`<div class="error-box">Error: ${e.message}<br>· La hoja debe ser pública (solo lectura)<br>· API key activa<br>· Google Sheets API habilitada</div>`;
+    ['table-area','top-area','bullets-area'].forEach(id=>document.getElementById(id).innerHTML=err);
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro — Finanzas Familia RR</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'IBM Plex Sans',sans-serif; background:#f5f5f4; color:#1a1a1a; padding:24px; font-size:14px; min-height:100vh; display:flex; align-items:flex-start; justify-content:center; }
+.container { width:100%; max-width:420px; }
+.header { margin-bottom:28px; }
+.header h1 { font-size:18px; font-weight:600; }
+.header-meta { font-family:'IBM Plex Mono',monospace; font-size:11px; color:#999; margin-top:3px; }
+.card { background:#fff; border:1px solid #e8e8e8; border-radius:10px; padding:24px; }
+.field { margin-bottom:18px; }
+.field label { display:block; font-family:'IBM Plex Mono',monospace; font-size:10px; color:#999; text-transform:uppercase; letter-spacing:.5px; margin-bottom:7px; }
+.toggle-group { display:grid; grid-template-columns:1fr 1fr; gap:0; background:#f5f5f4; border:1px solid #e0e0e0; border-radius:7px; overflow:hidden; }
+.toggle-btn { padding:10px; background:transparent; border:none; font-family:'IBM Plex Sans',sans-serif; font-size:13px; font-weight:500; color:#888; cursor:pointer; transition:all .15s; }
+.toggle-btn.active-gasto { background:#fff0f0; color:#e53e3e; }
+.toggle-btn.active-ingreso { background:#f0fff4; color:#16a34a; }
+input[type=text], input[type=number] { width:100%; padding:10px 12px; background:#fff; border:1px solid #e0e0e0; border-radius:7px; font-family:'IBM Plex Sans',sans-serif; font-size:14px; color:#1a1a1a; outline:none; transition:border-color .15s; }
+input:focus { border-color:#1a1a1a; }
+input::placeholder { color:#ccc; }
+.monto-wrap { position:relative; }
+.monto-prefix { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-family:'IBM Plex Mono',monospace; font-size:14px; color:#bbb; pointer-events:none; }
+.monto-wrap input { padding-left:26px; }
+.submit-btn { width:100%; padding:12px; background:#1a1a1a; color:#fff; border:none; border-radius:7px; font-family:'IBM Plex Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; transition:all .15s; margin-top:4px; }
+.submit-btn:hover { background:#333; }
+.submit-btn:disabled { background:#ccc; cursor:not-allowed; }
+.feedback { margin-top:14px; padding:12px 14px; border-radius:7px; font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.5; display:none; }
+.feedback.ok { background:#f0fff4; border:1px solid #bbf7d0; color:#16a34a; display:block; }
+.feedback.err { background:#fff0f0; border:1px solid #fecaca; color:#e53e3e; display:block; }
+.divider { height:1px; background:#f0f0f0; margin:18px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Finanzas Familia RR</h1>
+    <div class="header-meta">Registrar movimiento</div>
+  </div>
+  <div class="card">
+    <div class="field">
+      <label>Tipo de movimiento</label>
+      <div class="toggle-group">
+        <button class="toggle-btn active-gasto" id="btn-gasto" onclick="setTipo('Gasto')">↓ Gasto</button>
+        <button class="toggle-btn" id="btn-ingreso" onclick="setTipo('Ingreso')">↑ Ingreso</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Motivo</label>
+      <input type="text" id="motivo" placeholder="Ej: Mercado Libre, Coaching RNRO, Celular...">
+    </div>
+    <div class="field">
+      <label>Monto (USD)</label>
+      <div class="monto-wrap">
+        <span class="monto-prefix">$</span>
+        <input type="number" id="monto" placeholder="0.00" step="0.01" min="0">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <button class="submit-btn" id="submit-btn" onclick="enviar()">Registrar movimiento</button>
+    <div class="feedback" id="feedback"></div>
+  </div>
+</div>
+<script>
+const WEBHOOK = 'https://script.google.com/macros/s/AKfycbwvAD3TTnrEX_sH4_YUA4kQ8KflZPO0x7zE6SZTGNPfBEqV4oGRfSy2RU8pEdJb_z5l/exec';
+let tipo = 'Gasto';
+function setTipo(t) {
+  tipo = t;
+  document.getElementById('btn-gasto').className = 'toggle-btn' + (t === 'Gasto' ? ' active-gasto' : '');
+  document.getElementById('btn-ingreso').className = 'toggle-btn' + (t === 'Ingreso' ? ' active-ingreso' : '');
+}
+function fmtFecha() {
+  const now = new Date();
+  const d = String(now.getDate()).padStart(2,'0');
+  const m = String(now.getMonth()+1).padStart(2,'0');
+  const y = now.getFullYear();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  return `${d}/${m}/${y} ${hh}:${mm}`;
+}
+async function enviar() {
+  const motivo = document.getElementById('motivo').value.trim();
+  const monto = document.getElementById('monto').value;
+  const fb = document.getElementById('feedback');
+  const btn = document.getElementById('submit-btn');
+  fb.className = 'feedback';
+  fb.style.display = 'none';
+  if (!motivo || !monto) {
+    fb.textContent = '⚠ Completa todos los campos antes de registrar.';
+    fb.className = 'feedback err';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  const payload = { tipo, motivo, monto: parseFloat(monto).toFixed(2), fecha: fmtFecha() };
+  try {
+    await fetch(WEBHOOK, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    fb.textContent = `✓ ${tipo} registrado — ${motivo} · $${parseFloat(monto).toFixed(2)}`;
+    fb.className = 'feedback ok';
+    document.getElementById('motivo').value = '';
+    document.getElementById('monto').value = '';
+    setTipo('Gasto');
+  } catch(e) {
+    fb.textContent = '✕ Error de conexión. Intenta de nuevo.';
+    fb.className = 'feedback err';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Registrar movimiento';
+}
+</script>
+</body>
+</html>
