@@ -3,324 +3,334 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finanzas Familia RR</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Finanzas CEPPE — Dashboard</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'IBM Plex Sans',sans-serif; background:#f5f5f4; color:#1a1a1a; padding:24px; font-size:14px; }
-.header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
-.header h1 { font-size:18px; font-weight:600; }
-.header-meta { font-family:'IBM Plex Mono',monospace; font-size:11px; color:#999; margin-top:2px; }
-.dot { width:7px; height:7px; border-radius:50%; background:#22c55e; display:inline-block; margin-right:5px; animation:blink 2s infinite; }
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.refresh-btn { padding:7px 14px; background:#fff; border:1px solid #e0e0e0; border-radius:6px; font-family:'IBM Plex Sans',sans-serif; font-size:13px; cursor:pointer; color:#555; transition:all .15s; }
-.refresh-btn:hover { border-color:#999; color:#1a1a1a; }
-.controls { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; align-items:center; }
-.btn-group { display:flex; background:#fff; border:1px solid #e0e0e0; border-radius:6px; overflow:hidden; }
-.btn-p { padding:7px 12px; background:transparent; border:none; border-right:1px solid #e0e0e0; font-family:'IBM Plex Sans',sans-serif; font-size:13px; color:#777; cursor:pointer; transition:all .15s; }
-.btn-p:last-child { border-right:none; }
-.btn-p.active { background:#1a1a1a; color:#fff; }
-.btn-p:hover:not(.active) { background:#f0f0f0; }
-select, input[type=text] { padding:7px 12px; background:#fff; border:1px solid #e0e0e0; border-radius:6px; font-family:'IBM Plex Sans',sans-serif; font-size:13px; color:#1a1a1a; outline:none; transition:border-color .15s; }
-select:focus, input:focus { border-color:#888; }
-input::placeholder { color:#bbb; }
-input[type=text] { min-width:200px; }
-.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:20px; }
-.kpi { background:#fff; border:1px solid #e8e8e8; border-radius:8px; padding:16px 18px; }
-.kpi-label { font-size:11px; color:#999; text-transform:uppercase; letter-spacing:.4px; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
-.kpi-value { font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:500; line-height:1; }
-.kpi-sub { font-size:11px; color:#bbb; margin-top:5px; font-family:'IBM Plex Mono',monospace; }
-.red { color:#e53e3e; } .green { color:#16a34a; } .neutral { color:#1a1a1a; } .blue { color:#3b82f6; }
-.grid { display:grid; grid-template-columns:1fr 300px; gap:16px; margin-bottom:16px; }
-@media(max-width:800px){.grid{grid-template-columns:1fr;}}
-.card { background:#fff; border:1px solid #e8e8e8; border-radius:8px; padding:18px; }
-.card-title { font-size:11px; font-family:'IBM Plex Mono',monospace; color:#999; text-transform:uppercase; letter-spacing:.4px; margin-bottom:14px; }
-.table-wrap { overflow-x:auto; }
-table { width:100%; border-collapse:collapse; }
-th { font-family:'IBM Plex Mono',monospace; font-size:10px; color:#bbb; text-transform:uppercase; letter-spacing:.4px; padding:0 10px 8px; text-align:left; border-bottom:1px solid #f0f0f0; }
-td { padding:9px 10px; border-bottom:1px solid #f7f7f7; font-size:13px; vertical-align:middle; }
-tr:last-child td { border-bottom:none; }
-tr:hover td { background:#fafafa; }
-.badge { display:inline-block; padding:2px 7px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:500; }
-.badge-g { background:#fef2f2; color:#e53e3e; }
-.badge-i { background:#f0fdf4; color:#16a34a; }
-.amt-g { color:#e53e3e; font-family:'IBM Plex Mono',monospace; font-size:13px; }
-.amt-i { color:#16a34a; font-family:'IBM Plex Mono',monospace; font-size:13px; }
-.dt { color:#bbb; font-family:'IBM Plex Mono',monospace; font-size:11px; }
-.motivo-cell { max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.top-list { display:flex; flex-direction:column; gap:12px; }
-.top-row { display:flex; flex-direction:column; gap:4px; }
-.top-header { display:flex; justify-content:space-between; }
-.top-name { font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
-.top-amt { font-family:'IBM Plex Mono',monospace; font-size:12px; color:#e53e3e; }
-.bar-bg { height:3px; background:#f0f0f0; border-radius:2px; overflow:hidden; }
-.bar-fill { height:100%; background:#1a1a1a; border-radius:2px; transition:width .6s; }
-.top-pct { font-size:10px; color:#bbb; font-family:'IBM Plex Mono',monospace; }
-.bullet-list { display:flex; flex-direction:column; gap:8px; }
-.bullet { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:6px; background:#fafafa; border:1px solid #f0f0f0; font-size:13px; line-height:1.5; color:#444; }
-.bullet.warn { border-left:2px solid #e53e3e; background:#fff8f8; }
-.bullet.ok   { border-left:2px solid #22c55e; background:#f8fff9; }
-.bullet.inf  { border-left:2px solid #3b82f6; background:#f8faff; }
-.bi { font-size:13px; flex-shrink:0; margin-top:1px; color:#999; }
-.pagination { display:flex; gap:6px; margin-top:14px; justify-content:flex-end; flex-wrap:wrap; }
-.pg { padding:5px 10px; background:#fff; border:1px solid #e0e0e0; border-radius:5px; font-family:'IBM Plex Mono',monospace; font-size:11px; cursor:pointer; color:#777; transition:all .12s; }
-.pg:hover:not(:disabled) { border-color:#888; color:#1a1a1a; }
-.pg.active { background:#1a1a1a; color:#fff; border-color:#1a1a1a; }
-.pg:disabled { opacity:.3; cursor:not-allowed; }
-.loader { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:48px 0; gap:12px; }
-.loader-bar { width:120px; height:2px; background:#f0f0f0; border-radius:1px; overflow:hidden; }
-.loader-fill { height:100%; background:#1a1a1a; animation:ld 1.2s ease-in-out infinite; }
-@keyframes ld{0%{width:0%;margin-left:0}50%{width:50%;margin-left:25%}100%{width:0%;margin-left:100%}}
-.loader-txt { font-family:'IBM Plex Mono',monospace; font-size:11px; color:#bbb; }
-.error-box { padding:16px; background:#fff8f8; border:1px solid #fecaca; border-radius:6px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:#e53e3e; line-height:1.7; }
-.empty { color:#bbb; font-family:'IBM Plex Mono',monospace; font-size:12px; padding:24px 0; text-align:center; }
+  :root{
+    --bg:#f2f1ee;
+    --card:#ffffff;
+    --ink:#111111;
+    --muted:#8a8a8a;
+    --line:#e7e6e2;
+    --azul:#037a9c;
+    --azul2:#254781;
+    --amarillo:#ebbc38;
+    --green:#2e7d55;
+    --green-bg:#e8f3ec;
+    --red:#d64545;
+    --red-bg:#fbe9e9;
+    --radius:16px;
+    --mono:"SF Mono",ui-monospace,"Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);font-family:var(--sans);color:var(--ink);
+    -webkit-font-smoothing:antialiased;padding:24px 18px 70px;max-width:1000px;margin:0 auto}
+
+  .top h1{font-size:24px;font-weight:700;letter-spacing:-.3px}
+  .top .sub{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:3px}
+
+  /* filtros */
+  .filters{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 4px;align-items:flex-end}
+  .fgroup{display:flex;flex-direction:column;gap:5px}
+  .fgroup label{font-family:var(--mono);font-size:10px;letter-spacing:.6px;color:var(--muted);text-transform:uppercase}
+  select,input[type=date]{font-family:var(--sans);font-size:14px;padding:9px 12px;border:1px solid var(--line);
+    border-radius:10px;background:#fff;color:var(--ink);outline:none}
+  select:focus,input:focus{border-color:#b9b8b4}
+
+  /* tabs */
+  .tabs{display:inline-flex;background:#e9e8e4;border-radius:11px;padding:4px;gap:4px;margin:22px 0 16px}
+  .tabs button{font-family:var(--sans);font-size:14px;font-weight:600;padding:9px 22px;border:none;
+    border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;transition:.12s}
+  .tabs button.on-ing{background:var(--green-bg);color:var(--green)}
+  .tabs button.on-gas{background:var(--red-bg);color:var(--red)}
+
+  /* metric cards top */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+  .card{background:var(--card);border-radius:var(--radius);padding:18px;border:.5px solid var(--line)}
+  .card .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+  .card .val{font-size:26px;font-weight:600;letter-spacing:-.5px}
+  .card .val.ing{color:var(--green)} .card .val.gas{color:var(--red)} .card .val.bal{color:var(--azul)}
+  .card .foot{font-size:11px;color:var(--muted);margin-top:5px}
+
+  .section{background:var(--card);border-radius:var(--radius);padding:20px;border:.5px solid var(--line);margin-bottom:16px}
+  .section h2{font-family:var(--mono);font-size:12px;letter-spacing:.7px;color:var(--muted);text-transform:uppercase;margin-bottom:16px}
+
+  /* distribucion */
+  .barrow{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+  .barlbl{font-size:13px;min-width:150px;display:flex;align-items:center;gap:8px;color:#333}
+  .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .track{flex:1;height:20px;background:#f4f3f0;border-radius:5px;overflow:hidden}
+  .fill{height:100%;border-radius:5px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+  .barval{font-size:13px;font-weight:600;min-width:110px;text-align:right;font-variant-numeric:tabular-nums}
+  .barpct{font-size:11px;color:var(--muted);min-width:44px;text-align:right}
+
+  /* mes a mes */
+  .months{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+  .mcard{background:#faf9f7;border-radius:10px;padding:11px 8px;text-align:center}
+  .mcard .m{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+  .mcard .v{font-size:14px;font-weight:600}
+  .mbar{height:4px;border-radius:2px;margin-top:7px}
+
+  /* tabla detalle */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;padding:8px;font-family:var(--mono);font-size:10px;letter-spacing:.4px;color:var(--muted);
+    text-transform:uppercase;border-bottom:.5px solid var(--line)}
+  th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+  td{padding:9px 8px;border-bottom:.5px solid var(--line)}
+  tr:last-child td{border-bottom:none}
+  .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:#f0efec;color:#555}
+
+  .loading{text-align:center;padding:60px 20px;color:var(--muted);font-family:var(--mono);font-size:13px}
+  .empty{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+  .err{background:var(--red-bg);color:var(--red);padding:14px;border-radius:10px;font-size:13px;margin-top:16px}
+
+  .refresh{font-family:var(--sans);font-size:13px;padding:9px 16px;border:1px solid var(--line);
+    border-radius:10px;background:#fff;cursor:pointer;color:#333}
+  .refresh:hover{border-color:#b9b8b4}
+
+  @media(max-width:680px){
+    .cards{grid-template-columns:1fr}
+    .months{grid-template-columns:repeat(4,1fr)}
+    .barlbl{min-width:110px;font-size:12px}
+    .barval{min-width:80px;font-size:12px}
+  }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div>
-    <h1>Finanzas Familia RR</h1>
-    <div class="header-meta"><span class="dot"></span><span id="status">Cargando...</span></div>
+  <div class="top" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+    <div>
+      <h1>Finanzas CEPPE</h1>
+      <div class="sub" id="sub">Cargando datos en vivo…</div>
+    </div>
+    <button class="refresh" onclick="cargar()">↻ Actualizar</button>
   </div>
-  <button class="refresh-btn" onclick="loadData()">↻ Actualizar</button>
-</div>
 
-<div class="controls">
-  <div class="btn-group">
-    <button class="btn-p" onclick="setPeriod('today',this)">Hoy</button>
-    <button class="btn-p active" onclick="setPeriod('week',this)">7 días</button>
-    <button class="btn-p" onclick="setPeriod('month',this)">Este mes</button>
-    <button class="btn-p" onclick="setPeriod('last_month',this)">Mes ant.</button>
-    <button class="btn-p" onclick="setPeriod('all',this)">Todo</button>
+  <div class="filters">
+    <div class="fgroup">
+      <label>Unidad</label>
+      <select id="fUnidad" onchange="render()">
+        <option value="">Todas (CEPPE Group)</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label>Desde</label>
+      <input type="date" id="fDesde" onchange="render()">
+    </div>
+    <div class="fgroup">
+      <label>Hasta</label>
+      <input type="date" id="fHasta" onchange="render()">
+    </div>
+    <div class="fgroup">
+      <label>Rango rápido</label>
+      <select id="fRango" onchange="rangoRapido()">
+        <option value="ytd">Todo el año</option>
+        <option value="mes">Este mes</option>
+        <option value="mesant">Mes anterior</option>
+        <option value="30">Últimos 30 días</option>
+      </select>
+    </div>
   </div>
-  <select id="type-filter" onchange="applyFilters()">
-    <option value="">Gastos e ingresos</option>
-    <option value="Gasto">Solo gastos</option>
-    <option value="Ingreso">Solo ingresos</option>
-  </select>
-  <input type="text" id="search" placeholder="Buscar motivo..." oninput="applyFilters()">
-</div>
 
-<div class="kpis">
-  <div class="kpi"><div class="kpi-label">Total gastos</div><div class="kpi-value red" id="k-gastos">—</div><div class="kpi-sub" id="k-gastos-n">—</div></div>
-  <div class="kpi"><div class="kpi-label">Total ingresos</div><div class="kpi-value green" id="k-ingresos">—</div><div class="kpi-sub" id="k-ingresos-n">—</div></div>
-  <div class="kpi"><div class="kpi-label">Balance</div><div class="kpi-value neutral" id="k-balance">—</div><div class="kpi-sub">período seleccionado</div></div>
-  <div class="kpi"><div class="kpi-label">Mayor gasto</div><div class="kpi-value blue" id="k-top">—</div><div class="kpi-sub" id="k-top-name">—</div></div>
-</div>
-
-<div class="grid">
-  <div class="card">
-    <div class="card-title">Movimientos</div>
-    <div id="table-area"><div class="loader"><div class="loader-bar"><div class="loader-fill"></div></div><div class="loader-txt">Conectando con Google Sheets...</div></div></div>
-    <div class="pagination" id="pag"></div>
+  <div class="tabs" id="tabs">
+    <button data-tab="ingreso" class="on-ing">Ingresos</button>
+    <button data-tab="gasto">Gastos</button>
   </div>
-  <div class="card">
-    <div class="card-title">Top gastos</div>
-    <div id="top-area"><div class="loader"><div class="loader-bar"><div class="loader-fill"></div></div><div class="loader-txt">Calculando...</div></div></div>
-  </div>
-</div>
 
-<div class="card">
-  <div class="card-title">Análisis</div>
-  <div id="bullets-area"><div class="loader"><div class="loader-bar"><div class="loader-fill"></div></div><div class="loader-txt">Analizando...</div></div></div>
-</div>
+  <div id="content"><div class="loading">Cargando datos en vivo desde Google Sheets…</div></div>
 
 <script>
-const SHEET_ID = '1SK7vkmXjY1UtTlYBeVjVvzoDvdYfugAuYll6x7idjCw';
-const API_KEY  = 'AIzaSyCSFp95q8pCnTPQ0be7upCG0dieW8yBgcI';
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbw-5SF_I_ES5gFyUIC7KmYxQIuoZzWMP53TS9nHi5M-nswAiDBUI9lStqYs71r7rGnH/exec";
 
-let allData=[], filtered=[], period='week', page=1;
-const PER_PAGE=20;
+const COLORS = ['#037a9c','#254781','#8b1a6b','#3a9e5c','#9a6a00','#c07030','#8e6abf','#d64545'];
+const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
-function parseMonto(v) {
-  if (!v && v!==0) return 0;
-  let s = String(v).replace(/\s/g,'').replace('$','');
-  const hasComma = s.includes(',');
-  const hasDot   = s.includes('.');
-  if (hasComma && hasDot) {
-    s = s.replace(/\./g,'').replace(',','.');
-  } else if (hasComma && !hasDot) {
-    const parts = s.split(',');
-    if (parts[1] && parts[1].length <= 2) {
-      s = s.replace(',','.');
-    } else {
-      s = s.replace(/,/g,'');
-    }
-  }
-  return parseFloat(s) || 0;
-}
+let DATA = [];
+let tab = "ingreso";
+let ordenMov = "monto"; // "monto" o "fecha"
 
-function fmt(n) {
-  return '$' + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-}
-
-function parseDate(v) {
-  if (!v) return null;
-  const s = String(v).trim();
-  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (m) return new Date(+m[3], +m[2]-1, +m[1]);
-  return new Date(s);
-}
-
-function fmtDate(v) {
-  const d = parseDate(v);
-  if (!d||isNaN(d)) return v;
-  return d.toLocaleDateString('es',{day:'2-digit',month:'short',year:'2-digit'});
-}
-
-function periodRange(p) {
-  const now=new Date(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  switch(p) {
-    case 'today':      return [today, new Date(today.getTime()+86400000)];
-    case 'week':       return [new Date(today.getTime()-7*86400000), new Date(today.getTime()+86400000)];
-    case 'month':      return [new Date(now.getFullYear(),now.getMonth(),1), new Date(today.getTime()+86400000)];
-    case 'last_month': return [new Date(now.getFullYear(),now.getMonth()-1,1), new Date(now.getFullYear(),now.getMonth(),1)];
-    default:           return [new Date('2000-01-01'), new Date('2099-01-01')];
+async function cargar(){
+  document.getElementById('content').innerHTML='<div class="loading">Cargando…</div>';
+  try{
+    const res = await fetch(ENDPOINT);
+    DATA = await res.json();
+    DATA.forEach(r=>{
+      r.monto = Number(r.monto)||0;
+      r.monto_usd = Number(r.monto_usd)||r.monto;
+      r.fecha = String(r.fecha).slice(0,10);
+    });
+    poblarUnidades();
+    setRangoDefault();
+    document.getElementById('sub').textContent =
+      DATA.length+' movimientos · actualizado '+new Date().toLocaleTimeString('es-VE',{hour:'2-digit',minute:'2-digit'});
+    render();
+  }catch(e){
+    document.getElementById('content').innerHTML=
+      '<div class="err">No se pudo cargar la data. Revisa que el Apps Script esté publicado como "Cualquier persona". Detalle: '+e+'</div>';
   }
 }
 
-function setPeriod(p,btn) {
-  period=p;
-  document.querySelectorAll('.btn-p').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  applyFilters();
+function poblarUnidades(){
+  const sel=document.getElementById('fUnidad');
+  const uni=[...new Set(DATA.map(r=>r.unidad))].sort();
+  sel.innerHTML='<option value="">Todas (CEPPE Group)</option>'+
+    uni.map(u=>`<option value="${u}">${u}</option>`).join('');
 }
 
-function applyFilters() {
-  const [from,to]=periodRange(period);
-  const type=document.getElementById('type-filter').value;
-  const q=document.getElementById('search').value.toLowerCase();
-  filtered=allData.filter(r=>{
-    const d=parseDate(r[3]);
-    if(!d||isNaN(d)||d<from||d>=to) return false;
-    if(type&&r[0]!==type) return false;
-    if(q&&!String(r[1]).toLowerCase().includes(q)) return false;
-    return true;
+function setRangoDefault(){
+  const fechas=DATA.map(r=>r.fecha).filter(Boolean).sort();
+  if(fechas.length){
+    document.getElementById('fDesde').value=fechas[0];
+    document.getElementById('fHasta').value=fechas[fechas.length-1];
+  }
+}
+function rangoRapido(){
+  const v=document.getElementById('fRango').value;
+  const hoy=new Date();
+  const fmt=d=>d.toISOString().slice(0,10);
+  const fechas=DATA.map(r=>r.fecha).filter(Boolean).sort();
+  let desde,hasta=fmt(hoy);
+  if(v==='ytd'){ desde=fechas[0]; hasta=fechas[fechas.length-1]; }
+  else if(v==='mes'){ desde=fmt(new Date(hoy.getFullYear(),hoy.getMonth(),1)); }
+  else if(v==='mesant'){ desde=fmt(new Date(hoy.getFullYear(),hoy.getMonth()-1,1)); hasta=fmt(new Date(hoy.getFullYear(),hoy.getMonth(),0)); }
+  else if(v==='30'){ const d=new Date(hoy); d.setDate(d.getDate()-30); desde=fmt(d); }
+  document.getElementById('fDesde').value=desde;
+  document.getElementById('fHasta').value=hasta;
+  render();
+}
+
+document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>{
+  tab=b.dataset.tab;
+  document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('on-ing','on-gas'));
+  b.classList.add(tab==='ingreso'?'on-ing':'on-gas');
+  render();
+}));
+
+function filtrar(){
+  const u=document.getElementById('fUnidad').value;
+  const d=document.getElementById('fDesde').value;
+  const h=document.getElementById('fHasta').value;
+  return DATA.filter(r=>
+    r.tipo===tab &&
+    (!u || r.unidad===u) &&
+    (!d || r.fecha>=d) &&
+    (!h || r.fecha<=h)
+  );
+}
+
+function money(n){return '$'+n.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});}
+
+function cambiarOrden(){
+  ordenMov=document.getElementById('ordenMov').value;
+  render();
+}
+
+function render(){
+  if(!DATA.length) return;
+  const rows=filtrar();
+  const esIng=tab==='ingreso';
+  const acc=esIng?'var(--green)':'var(--red)';
+
+  // totales del periodo (ambos tipos, respetando unidad+fecha)
+  const u=document.getElementById('fUnidad').value;
+  const d=document.getElementById('fDesde').value;
+  const h=document.getElementById('fHasta').value;
+  const enRango=r=>(!u||r.unidad===u)&&(!d||r.fecha>=d)&&(!h||r.fecha<=h);
+  const totIng=DATA.filter(r=>r.tipo==='ingreso'&&enRango(r)).reduce((a,r)=>a+r.monto_usd,0);
+  const totGas=DATA.filter(r=>r.tipo==='gasto'&&enRango(r)).reduce((a,r)=>a+r.monto_usd,0);
+  const bal=totIng-totGas;
+
+  let html='';
+
+  // CARDS
+  html+=`<div class="cards">
+    <div class="card"><div class="lbl">Total ingresos</div><div class="val ing">${money(totIng)}</div><div class="foot">en el período</div></div>
+    <div class="card"><div class="lbl">Total gastos</div><div class="val gas">${money(totGas)}</div><div class="foot">en el período</div></div>
+    <div class="card"><div class="lbl">Balance</div><div class="val bal">${money(bal)}</div><div class="foot">ingresos − gastos</div></div>
+  </div>`;
+
+  const total=rows.reduce((a,r)=>a+r.monto_usd,0);
+
+  if(!rows.length){
+    html+=`<div class="section"><div class="empty">No hay ${esIng?'ingresos':'gastos'} en este período o unidad.</div></div>`;
+    document.getElementById('content').innerHTML=html;
+    return;
+  }
+
+  // DISTRIBUCION por unidad (o por categoria/motivo si ya se filtró una unidad)
+  const agrupaPor = u ? (esIng?'motivo':'categoria') : 'unidad';
+  const grupos={};
+  rows.forEach(r=>{
+    let k=r[agrupaPor]||'(sin especificar)';
+    if(agrupaPor==='categoria' && !r.categoria) k=r.motivo||'(sin categoría)';
+    grupos[k]=(grupos[k]||0)+r.monto_usd;
   });
-  page=1; render();
-}
+  const ranked=Object.entries(grupos).sort((a,b)=>b[1]-a[1]);
+  const max=ranked[0][1];
+  const tituloDist = u ? (esIng?'Distribución por concepto':'Distribución por categoría') : 'Distribución por unidad';
 
-function render() { renderKPIs(); renderTable(); renderTop(); renderBullets(); }
-
-function renderKPIs() {
-  const gastos=filtered.filter(r=>r[0]==='Gasto');
-  const ingresos=filtered.filter(r=>r[0]==='Ingreso');
-  const totalG=gastos.reduce((s,r)=>s+parseMonto(r[2]),0);
-  const totalI=ingresos.reduce((s,r)=>s+parseMonto(r[2]),0);
-  const bal=totalI-totalG;
-  document.getElementById('k-gastos').textContent=fmt(totalG);
-  document.getElementById('k-gastos-n').textContent=gastos.length+' movimientos';
-  document.getElementById('k-ingresos').textContent=fmt(totalI);
-  document.getElementById('k-ingresos-n').textContent=ingresos.length+' movimientos';
-  const bEl=document.getElementById('k-balance');
-  bEl.textContent=(bal>=0?'+':'-')+fmt(bal);
-  bEl.className='kpi-value '+(bal>=0?'green':'red');
-  if(gastos.length){
-    const top=gastos.reduce((a,b)=>parseMonto(a[2])>parseMonto(b[2])?a:b);
-    document.getElementById('k-top').textContent=fmt(parseMonto(top[2]));
-    document.getElementById('k-top-name').textContent=top[1];
-  }
-}
-
-function renderTable() {
-  const area=document.getElementById('table-area');
-  if(!filtered.length){area.innerHTML='<p class="empty">Sin movimientos en este período.</p>';document.getElementById('pag').innerHTML='';return;}
-  const sorted=[...filtered].sort((a,b)=>{const da=parseDate(a[3]),db=parseDate(b[3]);return (db||0)-(da||0);});
-  const start=(page-1)*PER_PAGE;
-  const slice=sorted.slice(start,start+PER_PAGE);
-  let h='<div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Motivo</th><th>Monto</th><th>Fecha</th></tr></thead><tbody>';
-  slice.forEach(r=>{
-    const g=r[0]==='Gasto';
-    h+=`<tr><td><span class="badge ${g?'badge-g':'badge-i'}">${r[0]}</span></td><td class="motivo-cell" title="${r[1]||''}">${r[1]||'—'}</td><td class="${g?'amt-g':'amt-i'}">${g?'-':'+'}${fmt(parseMonto(r[2]))}</td><td class="dt">${fmtDate(r[3])}</td></tr>`;
+  html+=`<div class="section"><h2>${tituloDist} · ${money(total)}</h2>`;
+  ranked.forEach(([k,v],i)=>{
+    const pct=(v/total*100).toFixed(1);
+    const w=(v/max*100).toFixed(0);
+    const c=COLORS[i%COLORS.length];
+    html+=`<div class="barrow">
+      <div class="barlbl"><span class="dot" style="background:${c}"></span>${k}</div>
+      <div class="track"><div class="fill" style="width:${w}%;background:${c}"></div></div>
+      <div class="barval">${money(v)}</div>
+      <div class="barpct">${pct}%</div>
+    </div>`;
   });
-  h+='</tbody></table></div>';
-  area.innerHTML=h;
-  const totalPgs=Math.ceil(sorted.length/PER_PAGE);
-  let pg='';
-  if(totalPgs>1){
-    pg+=`<button class="pg" onclick="goPage(${page-1})" ${page===1?'disabled':''}>←</button>`;
-    for(let i=1;i<=totalPgs;i++) pg+=`<button class="pg ${i===page?'active':''}" onclick="goPage(${i})">${i}</button>`;
-    pg+=`<button class="pg" onclick="goPage(${page+1})" ${page===totalPgs?'disabled':''}>→</button>`;
-  }
-  document.getElementById('pag').innerHTML=pg;
-}
+  html+=`</div>`;
 
-function goPage(p){page=p;renderTable();}
-
-function renderTop() {
-  const area=document.getElementById('top-area');
-  const gastos=filtered.filter(r=>r[0]==='Gasto');
-  if(!gastos.length){area.innerHTML='<p class="empty">Sin gastos.</p>';return;}
-  // Agrupar por motivo
-  const map={};
-  gastos.forEach(r=>{
-    const key=String(r[1]||'Sin motivo').trim();
-    map[key]=(map[key]||0)+parseMonto(r[2]);
+  // MES A MES
+  const porMes={};
+  rows.forEach(r=>{
+    const m=parseInt(r.fecha.slice(5,7))-1;
+    if(m>=0&&m<12) porMes[m]=(porMes[m]||0)+r.monto_usd;
   });
-  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const total=gastos.reduce((s,r)=>s+parseMonto(r[2]),0);
-  let h='<div class="top-list">';
-  sorted.forEach(([name,amt])=>{
-    const pct=total>0?Math.round(amt/total*100):0;
-    h+=`<div class="top-row"><div class="top-header"><span class="top-name" title="${name}">${name}</span><span class="top-amt">${fmt(amt)}</span></div><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><div class="top-pct">${pct}% del total</div></div>`;
+  const mesesUsados=Object.keys(porMes).map(Number).sort((a,b)=>a-b);
+  const maxMes=Math.max(...Object.values(porMes),1);
+  html+=`<div class="section"><h2>Evolución mes a mes</h2><div class="months">`;
+  mesesUsados.forEach(m=>{
+    const v=porMes[m];
+    const w=(v/maxMes*100).toFixed(0);
+    html+=`<div class="mcard"><div class="m">${MESES[m]}</div><div class="v">${money(v)}</div>
+      <div class="mbar" style="width:${w}%;background:${acc}"></div></div>`;
   });
-  h+='</div>';
-  area.innerHTML=h;
+  html+=`</div></div>`;
+
+  // DETALLE (movimientos del periodo, orden seleccionable)
+  const det=[...rows].sort((a,b)=>
+    ordenMov==='monto' ? b.monto_usd-a.monto_usd : b.fecha.localeCompare(a.fecha)
+  ).slice(0,40);
+  const ordenTxt = ordenMov==='monto' ? '40 de mayor monto' : '40 más recientes';
+  html+=`<div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+      <h2 style="margin:0">Movimientos (${rows.length}) · mostrando ${ordenTxt}</h2>
+      <select id="ordenMov" onchange="cambiarOrden()" style="font-size:13px;padding:7px 11px">
+        <option value="monto"${ordenMov==='monto'?' selected':''}>Mayor a menor</option>
+        <option value="fecha"${ordenMov==='fecha'?' selected':''}>Más reciente</option>
+      </select>
+    </div>
+    <div style="overflow-x:auto"><table><thead><tr>
+    <th>Fecha</th><th>Unidad</th><th>Motivo</th><th>Cuenta</th><th class="num">Monto</th>
+    </tr></thead><tbody>`;
+  det.forEach(r=>{
+    html+=`<tr>
+      <td>${r.fecha}</td>
+      <td><span class="tag">${r.unidad}</span></td>
+      <td>${r.motivo||'—'}</td>
+      <td style="color:var(--muted)">${r.cuenta||'—'}</td>
+      <td class="num" style="color:${acc};font-weight:600">${money(r.monto_usd)}</td>
+    </tr>`;
+  });
+  html+=`</tbody></table></div></div>`;
+
+  document.getElementById('content').innerHTML=html;
 }
 
-function renderBullets() {
-  const area=document.getElementById('bullets-area');
-  if(!filtered.length){area.innerHTML='<p class="empty">Sin datos.</p>';return;}
-  const gastos=filtered.filter(r=>r[0]==='Gasto');
-  const ingresos=filtered.filter(r=>r[0]==='Ingreso');
-  const totalG=gastos.reduce((s,r)=>s+parseMonto(r[2]),0);
-  const totalI=ingresos.reduce((s,r)=>s+parseMonto(r[2]),0);
-  const bal=totalI-totalG;
-  const items=[];
-  if(bal>=0) items.push({cl:'ok',icon:'↑',txt:`Balance positivo de ${fmt(bal)}. Ingresaste más de lo que gastaste en este período.`});
-  else       items.push({cl:'warn',icon:'↓',txt:`Balance negativo de ${fmt(Math.abs(bal))}. Gastaste ${fmt(Math.abs(bal))} más de lo que ingresaste.`});
-  if(gastos.length){
-    const top=gastos.reduce((a,b)=>parseMonto(a[2])>parseMonto(b[2])?a:b);
-    items.push({cl:'inf',icon:'→',txt:`Mayor gasto individual: ${top[1]} — ${fmt(parseMonto(top[2]))}.`});
-  }
-  if(gastos.length&&period!=='all'){
-    const [from,to]=periodRange(period);
-    const dias=Math.max(1,Math.round((to-from)/86400000));
-    items.push({cl:'',icon:'≈',txt:`Gasto promedio diario: ${fmt(totalG/dias)} (${dias} días).`});
-  }
-  if(gastos.length){
-    const freq={};
-    gastos.forEach(r=>{freq[r[1]]=(freq[r[1]]||0)+1;});
-    const [topM,topN]=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];
-    if(topN>1) items.push({cl:'inf',icon:'↻',txt:`"${topM}" es el gasto más frecuente: ${topN} veces.`});
-  }
-  let h='<div class="bullet-list">';
-  items.forEach(b=>{h+=`<div class="bullet ${b.cl}"><span class="bi">${b.icon}</span><span>${b.txt}</span></div>`;});
-  h+='</div>';
-  area.innerHTML=h;
-}
-
-async function loadData() {
-  document.getElementById('status').textContent='Actualizando...';
-  // Columnas: A=Tipo, B=Motivo, C=Monto, D=Fecha
-  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:D?key=${API_KEY}`;
-  try {
-    const res=await fetch(url);
-    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Error de API');}
-    const data=await res.json();
-    allData=(data.values||[]).slice(1).filter(r=>r&&r[0]);
-    const t=new Date();
-    document.getElementById('status').textContent=`${allData.length} movimientos · ${t.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})}`;
-    applyFilters();
-  } catch(e) {
-    document.getElementById('status').textContent='Error al cargar';
-    const err=`<div class="error-box">Error: ${e.message}<br>· La hoja debe ser pública (solo lectura)<br>· API key activa<br>· Google Sheets API habilitada</div>`;
-    ['table-area','top-area','bullets-area'].forEach(id=>document.getElementById(id).innerHTML=err);
-  }
-}
-
-loadData();
+cargar();
 </script>
 </body>
 </html>
